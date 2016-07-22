@@ -532,6 +532,11 @@ void store_probe_data_srcs ()
 }
 
 
+// TRIGGER
+
+#define VP_TRIGGER_R   0x01000000
+#define VP_TRIGGER_0   0x04000000
+#define VP_TRIGGER_F   0x08000000
 
 // mini probe program flow interpreter kernel
 void next_section (){
@@ -541,7 +546,39 @@ void next_section (){
 //		if (probe.vector < (DSP_INT)(&prbdf)) // error, cancel probe now.
 //			stop_probe ();
 	}
-	else{
+	
+	
+	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
+	
+	else if (probe.vector->options & VP_TRIGGER_R) { // "TP" bzw. VP_TRIGGER_R => Warte auf Triggerpuls
+		DSP_IINT gpio_data_tmp = 0;
+		WR_GPIO(GPIO_Data_0, &gpio_data_tmp, 0);
+		if ( (gpio_data_tmp & 1)) {
+			probe.vector->options &= !VP_TRIGGER_R;
+			probe.vector->options |=  VP_TRIGGER_F;
+		}
+	}
+	else if (probe.vector->options & VP_TRIGGER_F) {
+		DSP_IINT gpio_data_tmp = 0;
+		WR_GPIO(GPIO_Data_0, &gpio_data_tmp, 0);
+		if (!(gpio_data_tmp & 1)) {
+			probe.vector->options &= !VP_TRIGGER_F;
+			probe.vector->options |=  VP_TRIGGER_0;
+		}
+	}
+	
+	else {
+		
+		if (probe.vector->options & VP_TRIGGER_0) {
+			probe.vector->options &= !VP_TRIGGER_0;
+			probe.vector->options |=  VP_TRIGGER_R;
+		}
+		
+	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
+	
+	
 		if (!probe.vector->ptr_final){ // end Vector program?
 			stop_probe ();
 			return;
