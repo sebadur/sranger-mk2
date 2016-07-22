@@ -4,6 +4,7 @@ This software is configured to perform a vector mode (LM) pulse with option to a
 a trigger pulse on GPIO-0. For that enable "TP"-flag where the trigger needs to be.
 Care that output-mask of the pin is 0.
 Forked from https://sourceforge.net/p/sranger/svn/HEAD/tree/trunk/SRanger/
+Licensed under GNU GPL Version 2, June 1991
 
 
 ** install the TI "cgtools-c5500" in /opt/TI/cgtools-c55 -- tested with:
